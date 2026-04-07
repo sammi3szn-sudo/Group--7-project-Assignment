@@ -29,9 +29,20 @@ def init_db():
     conn.commit()
     conn.close()
     import pandas as pd
-
 def get_products():
     conn = sqlite3.connect("inventory.db")
     df = pd.read_sql_query("SELECT * FROM products", conn)
     conn.close()
     return df
+import streamlit as st
+
+# --- Streamlit UI ---
+st.title("📦 Inventory Management System")
+
+# Confirm Streamlit works
+st.write("✅ Streamlit is running correctly!")
+
+# Initialize DB
+init_db()
+
+menu = st.sidebar.selectbox("Menu", ["Dashboard", "Add Product", "Update Stock", "Reports"])
