@@ -35,3 +35,8 @@ def init_db():
     c.execute("UPDATE products SET stock_level = stock_level + ? WHERE barcode = ?", (qty, barcode))
     conn.commit()
     conn.close()
+    def get_products():
+    conn = get_connection()
+    rows = conn.execute("SELECT * FROM products").fetchall()
+    conn.close()
+    return rows
