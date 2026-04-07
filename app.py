@@ -22,3 +22,9 @@ def init_db():
               (name, barcode, stock, reorder, price))
     conn.commit()
     conn.close()
+    def update_stock(barcode, qty):
+    conn = sqlite3.connect("inventory.db")
+    c = conn.cursor()
+    c.execute("UPDATE products SET stock_level = stock_level + ? WHERE barcode = ?", (qty, barcode))
+    conn.commit()
+    conn.close()
