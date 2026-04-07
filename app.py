@@ -46,3 +46,7 @@ st.write("✅ Streamlit is running correctly!")
 init_db()
 
 menu = st.sidebar.selectbox("Menu", ["Dashboard", "Add Product", "Update Stock", "Reports"])
+if menu == "Dashboard":
+    st.subheader("Current Inventory")
+    df = get_products()
+    st.dataframe(df)
