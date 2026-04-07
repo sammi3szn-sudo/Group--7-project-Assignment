@@ -1,3 +1,6 @@
+# modules/alerts.py
+import streamlit as st
+from modules import db
 def show_low_stock_alerts():
     products = db.get_products()
     low_stock = [p for p in products if p[3] <= p[4]]  # stock_level <= reorder_level
