@@ -60,3 +60,10 @@ if menu == "Dashboard":
     if st.button("Add Product"):
         add_product(name, barcode, stock, reorder, price)
         st.success("Product added successfully!")
+        elif menu == "Update Stock":
+    st.subheader("Update Stock")
+    barcode = st.text_input("Barcode")
+    qty = st.number_input("Quantity Change (+/-)", min_value=-1000, max_value=1000)
+    if st.button("Update Stock"):
+        update_stock(barcode, qty)
+        st.success("Stock updated successfully!")
