@@ -28,3 +28,10 @@ def init_db():
     c.execute("UPDATE products SET stock_level = stock_level + ? WHERE barcode = ?", (qty, barcode))
     conn.commit()
     conn.close()
+    import pandas as pd
+
+def get_products():
+    conn = sqlite3.connect("inventory.db")
+    df = pd.read_sql_query("SELECT * FROM products", conn)
+    conn.close()
+    return df
