@@ -7,3 +7,18 @@ os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
 
 def get_connection():
     return sqlite3.connect(DB_PATH)
+def init_db():
+    conn = get_connection()
+    c = conn.cursor()
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS products (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            barcode TEXT UNIQUE,
+            stock_level INTEGER DEFAULT 0,
+            reorder_level INTEGER DEFAULT 5,
+            price REAL DEFAULT 0.0
+        )
+    ''')
+    conn.commit()
+    conn.close()
