@@ -67,3 +67,8 @@ if menu == "Dashboard":
     if st.button("Update Stock"):
         update_stock(barcode, qty)
         st.success("Stock updated successfully!")
+        elif menu == "Reports":
+    st.subheader("Export Inventory")
+    df = get_products()
+    st.dataframe(df)
+    st.download_button("Download CSV", df.to_csv(index=False), "inventory.csv")
