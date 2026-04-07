@@ -50,3 +50,13 @@ if menu == "Dashboard":
     st.subheader("Current Inventory")
     df = get_products()
     st.dataframe(df)
+    elif menu == "Add Product":
+    st.subheader("Add New Product")
+    name = st.text_input("Product Name")
+    barcode = st.text_input("Barcode")
+    stock = st.number_input("Initial Stock", min_value=0)
+    reorder = st.number_input("Reorder Level", min_value=0)
+    price = st.number_input("Price", min_value=0.0)
+    if st.button("Add Product"):
+        add_product(name, barcode, stock, reorder, price)
+        st.success("Product added successfully!")
