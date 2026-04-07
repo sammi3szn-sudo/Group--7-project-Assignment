@@ -6,3 +6,5 @@ class BarcodeScanner:
 
     def __init__(self):
         self.pyzbar_available = False
+            def scan_image(self, image_bytes):
+        return None  # Image scanning disabled
