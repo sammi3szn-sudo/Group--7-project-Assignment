@@ -1,0 +1,3 @@
+id,name,barcode,stock_level,reorder_level,price
+1,Test Item,12345,10,5,100.0
+2,IPHONE,2026,2,5,1900.0
