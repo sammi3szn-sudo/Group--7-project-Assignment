@@ -19,6 +19,47 @@ def main():
         if st.button("Add"):
             db.add_product(name, barcode, stock_level, reorder_level, price)
             st.success(f"Added {name} successfully!")
+    elif choice == "Dashboard":
+        st.subheader("📊 Inventory Dashboard")
+
+        df = db.view_products()
+
+        if not df.empty:
+
+            # --- METRICS ---
+            total_products = len(df)
+            total_stock = df["stock_level"].sum()
+            low_stock = len(df[df["stock_level"] <= df["reorder_level"]])
+            total_value = (df["stock_level"] * df["price"]).sum()
+
+            col1, col2, col3, col4 = st.columns(4)
+
+            col1.metric("Total Products", total_products)
+            col2.metric("Total Stock", total_stock)
+            col3.metric("Low Stock Items", low_stock)
+            col4.metric("Inventory Value", f"₦{total_value:,.2f}")
+
+            st.divider()
+
+            # --- STOCK LEVEL CHART ---
+            st.write("### 📦 Stock Levels per Product")
+            st.bar_chart(df.set_index("name")["stock_level"])
+
+            # --- PRICE DISTRIBUTION ---
+            st.write("### 💰 Price Distribution")
+            st.bar_chart(df.set_index("name")["price"])
+
+            # --- LOW STOCK TABLE ---
+            st.write("### ⚠️ Low Stock Products")
+            low_stock_df = df[df["stock_level"] <= df["reorder_level"]]
+
+            if not low_stock_df.empty:
+                st.dataframe(low_stock_df)
+            else:
+                st.success("No low stock items 🎉")
+
+        else:
+            st.info("No data available yet. Add some products first.")
 
     elif choice == "View Products":
         st.subheader("Product List")
