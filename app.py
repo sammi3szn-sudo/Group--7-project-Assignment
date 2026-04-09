@@ -29,7 +29,7 @@ def main():
     choice = st.sidebar.selectbox("Select an option", menu)
 
     elif choice == "Add Product":
-    st.subheader("Add New Product")
+        st.subheader("Add New Product")
     name = st.text_input("Product Name")
     barcode = st.text_input("Barcode")
     stock_level = st.number_input("Stock Level", min_value=0)
@@ -41,7 +41,7 @@ def main():
     if st.button("Add"):
         db.add_product(name, barcode, stock_level, reorder_level, price)
         st.success(f"Added {name} successfully!")
-        
+
     elif choice == "View Products":
         st.subheader("Product List")
         df = db.view_products()
@@ -73,6 +73,18 @@ def main():
                     st.error("Product not found")
         else:
             st.info("No products available yet.")
+
+     elif choice == "Delete Product":
+        st.subheader("Delete Product")
+    df = db.view_products()
+    if not df.empty:
+        product_names = df['name'].tolist()
+        selected_product = st.selectbox("Choose product to delete", product_names)
+        if st.button("Delete"):
+            db.delete_product(selected_product)
+            st.success(f"Deleted {selected_product} successfully!")
+    else:
+        st.info("No products available to delete.")
 
 if __name__ == "__main__":
     db.init_db()
