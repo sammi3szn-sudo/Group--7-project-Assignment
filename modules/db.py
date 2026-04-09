@@ -30,3 +30,22 @@ def view_products():
     df = pd.read_sql_query("SELECT * FROM products", conn)
     conn.close()
     return df
+
+# New functions below
+
+def delete_product(name):
+    """Delete a product by name"""
+    conn = sqlite3.connect("inventory.db")
+    c = conn.cursor()
+    c.execute("DELETE FROM products WHERE name=?", (name,))
+    conn.commit()
+    conn.close()
+
+def find_product_by_name(name):
+    """Find a product by name"""
+    conn = sqlite3.connect("inventory.db")
+    c = conn.cursor()
+    c.execute("SELECT * FROM products WHERE name=?", (name,))
+    product = c.fetchone()
+    conn.close()
+    return product

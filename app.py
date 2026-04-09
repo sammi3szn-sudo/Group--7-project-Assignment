@@ -1,58 +1,20 @@
 from modules import db, alerts, export, barcode_scanner
 import streamlit as st
-import sqlite3
 import pandas as pd
 
-# Initialize database
-def init_db():
-    conn = sqlite3.connect("inventory.db")
-    c = conn.cursor()
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS products (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            barcode TEXT UNIQUE,
-            stock_level INTEGER DEFAULT 0,
-            reorder_level INTEGER DEFAULT 5,
-            price REAL DEFAULT 0.0
-        )
-    ''')
-    conn.commit()
-    conn.close()
-
-# Function to add a product
-def add_product(name, barcode, stock_level, reorder_level, price):
-    conn = sqlite3.connect("inventory.db")
-    c = conn.cursor()
-    c.execute("INSERT INTO products (name, barcode, stock_level, reorder_level, price) VALUES (?, ?, ?, ?, ?)",
-              (name, barcode, stock_level, reorder_level, price))
-    conn.commit()
-    conn.close()
-
-# Function to view products
-def view_products():
-    conn = sqlite3.connect("inventory.db")
-    df = pd.read_sql_query("SELECT * FROM products", conn)
-    conn.close()
-    return df
-
-
-
-# Streamlit UI
 def main():
     st.title("Inventory Management System")
 
-    # Sidebar menu
-    menu = ["Add Product", "View Products", "Alerts", "Export", "Barcode Scanner"]
-    choice = st.sidebar.selectbox("Menu", menu)
+    menu = ["Add Product", "View Products", "Alerts", "Export", "Barcode Scanner", "Delete Product", "Search Product"]
+    choice = st.sidebar.selectbox("Select an option", menu)
 
     if choice == "Add Product":
         st.subheader("Add New Product")
         name = st.text_input("Product Name")
         barcode = st.text_input("Barcode")
         stock_level = st.number_input("Stock Level", min_value=0)
-        reorder_level = st.number_input("Reorder Level", min_value=0)
-        price = st.number_input("Price", min_value=0.0, format="%.2f")
+        reorder_level = st.selectbox("Reorder Level", [5, 10, 20, 50])
+        price = st.selectbox("Price Range", [100.00, 250.00, 500.00, 1000.00])
 
         if st.button("Add"):
             db.add_product(name, barcode, stock_level, reorder_level, price)
@@ -65,24 +27,63 @@ def main():
 
     elif choice == "Alerts":
         st.subheader("Stock Alerts")
-        for alert in alerts.check_alerts():
-            st.warning(alert)
+        alerts_data = alerts.check_alerts()
+        if alerts_data:
+            df_alerts = pd.DataFrame(alerts_data, columns=["Product", "Stock Level", "Reorder Level"])
+            st.table(df_alerts)
+        else:
+            st.success("No alerts. All stock levels are sufficient.")
 
     elif choice == "Export":
         st.subheader("Export Inventory")
         if st.button("Export to CSV"):
             filename = export.export_to_csv()
             st.success(f"Data exported to {filename}")
+        if st.button("Export to Excel"):
+            filename = export.export_to_excel()
+            st.success(f"Data exported to {filename}")
 
     elif choice == "Barcode Scanner":
         st.subheader("Find Product by Barcode")
-        barcode = st.text_input("Enter barcode")
-        if st.button("Search"):
-            product = barcode_scanner.find_product_by_barcode(barcode)
-            if product:
-                st.write(product)
-            else:
-                st.error("Product not found")
+        df = db.view_products()
+        if not df.empty:
+            barcode_list = df['barcode'].dropna().tolist()
+            selected_barcode = st.selectbox("Choose a barcode", barcode_list)
+            if st.button("Search"):
+                product = barcode_scanner.find_product_by_barcode(selected_barcode)
+                if product:
+                    st.write(product)
+                else:
+                    st.error("Product not found")
+        else:
+            st.info("No products available yet.")
+
+    elif choice == "Delete Product":
+        st.subheader("Delete Product")
+        df = db.view_products()
+        if not df.empty:
+            product_names = df['name'].tolist()
+            selected_product = st.selectbox("Choose product to delete", product_names)
+            if st.button("Delete"):
+                db.delete_product(selected_product)
+                st.success(f"Deleted {selected_product} successfully!")
+        else:
+            st.info("No products available to delete.")
+
+    elif choice == "Search Product":
+        st.subheader("Find Product by Name")
+        df = db.view_products()
+        if not df.empty:
+            product_names = df['name'].tolist()
+            selected_name = st.selectbox("Choose a product", product_names)
+            if st.button("Search"):
+                product = db.find_product_by_name(selected_name)
+                if product:
+                    st.write(product)
+                else:
+                    st.error("Product not found")
+        else:
+            st.info("No products available yet.")
 
 if __name__ == "__main__":
     db.init_db()
