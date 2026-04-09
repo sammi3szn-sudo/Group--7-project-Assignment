@@ -28,18 +28,20 @@ def main():
     menu = ["Add Product", "View Products", "Alerts", "Export", "Barcode Scanner"]
     choice = st.sidebar.selectbox("Select an option", menu)
 
-    if choice == "Add Product":
-        st.subheader("Add New Product")
-        name = st.text_input("Product Name")
-        barcode = st.text_input("Barcode")
-        stock_level = st.number_input("Stock Level", min_value=0)
-        reorder_level = st.number_input("Reorder Level", min_value=0)
-        price = st.number_input("Price", min_value=0.0, format="%.2f")
+    elif choice == "Add Product":
+    st.subheader("Add New Product")
+    name = st.text_input("Product Name")
+    barcode = st.text_input("Barcode")
+    stock_level = st.number_input("Stock Level", min_value=0)
 
-        if st.button("Add"):
-            db.add_product(name, barcode, stock_level, reorder_level, price)
-            st.success(f"Added {name} successfully!")
+    # Replace with dropdowns
+    reorder_level = st.selectbox("Reorder Level", [5, 10, 20, 50])
+    price = st.selectbox("Price Range", [100.00, 250.00, 500.00, 1000.00])
 
+    if st.button("Add"):
+        db.add_product(name, barcode, stock_level, reorder_level, price)
+        st.success(f"Added {name} successfully!")
+        
     elif choice == "View Products":
         st.subheader("Product List")
         df = db.view_products()
