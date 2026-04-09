@@ -49,8 +49,12 @@ def main():
 
     elif choice == "Alerts":
         st.subheader("Stock Alerts")
-        for alert in alerts.check_alerts():
-            st.warning(alert)
+    alerts_data = alerts.check_alerts()
+    if alerts_data:
+        df_alerts = pd.DataFrame(alerts_data, columns=["Product", "Stock Level", "Reorder Level"])
+        st.table(df_alerts)
+    else:
+        st.success("No alerts. All stock levels are sufficient.")
 
     elif choice == "Export":
         st.subheader("Export Inventory")
