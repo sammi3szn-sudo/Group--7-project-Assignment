@@ -20,31 +20,13 @@ def init_db():
     conn.commit()
     conn.close()
 
-# Function to add a product
-def add_product(name, barcode, stock_level, reorder_level, price):
-    conn = sqlite3.connect("inventory.db")
-    c = conn.cursor()
-    c.execute("INSERT INTO products (name, barcode, stock_level, reorder_level, price) VALUES (?, ?, ?, ?, ?)",
-              (name, barcode, stock_level, reorder_level, price))
-    conn.commit()
-    conn.close()
-
-# Function to view products
-def view_products():
-    conn = sqlite3.connect("inventory.db")
-    df = pd.read_sql_query("SELECT * FROM products", conn)
-    conn.close()
-    return df
-
-
-
 # Streamlit UI
 def main():
     st.title("Inventory Management System")
 
-    # Sidebar menu
+    # Sidebar menu as a clean dropdown
     menu = ["Add Product", "View Products", "Alerts", "Export", "Barcode Scanner"]
-    choice = st.sidebar.selectbox("Menu", menu)
+    choice = st.sidebar.selectbox("Select an option", menu)
 
     if choice == "Add Product":
         st.subheader("Add New Product")
@@ -76,13 +58,19 @@ def main():
 
     elif choice == "Barcode Scanner":
         st.subheader("Find Product by Barcode")
-        barcode = st.text_input("Enter barcode")
-        if st.button("Search"):
-            product = barcode_scanner.find_product_by_barcode(barcode)
-            if product:
-                st.write(product)
-            else:
-                st.error("Product not found")
+        # Instead of typing, show dropdown of available barcodes
+        df = db.view_products()
+        if not df.empty:
+            barcode_list = df['barcode'].dropna().tolist()
+            selected_barcode = st.selectbox("Choose a barcode", barcode_list)
+            if st.button("Search"):
+                product = barcode_scanner.find_product_by_barcode(selected_barcode)
+                if product:
+                    st.write(product)
+                else:
+                    st.error("Product not found")
+        else:
+            st.info("No products available yet.")
 
 if __name__ == "__main__":
     db.init_db()
