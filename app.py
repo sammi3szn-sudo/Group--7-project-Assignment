@@ -58,10 +58,12 @@ def main():
 
     elif choice == "Export":
         st.subheader("Export Inventory")
-        if st.button("Export to CSV"):
-            filename = export.export_to_csv()
-            st.success(f"Data exported to {filename}")
-
+    if st.button("Export to CSV"):
+        filename = export.export_to_csv()
+        st.success(f"Data exported to {filename}")
+    if st.button("Export to Excel"):
+        filename = export.export_to_excel()
+        st.success(f"Data exported to {filename}")
     elif choice == "Barcode Scanner":
         st.subheader("Find Product by Barcode")
         # Instead of typing, show dropdown of available barcodes
