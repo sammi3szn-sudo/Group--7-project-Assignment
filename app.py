@@ -92,6 +92,21 @@ def main():
     else:
         st.info("No products available to delete.")
 
+     elif choice == "Search Product":
+    st.subheader("Find Product by Name")
+    df = db.view_products()
+    if not df.empty:
+        product_names = df['name'].tolist()
+        selected_name = st.selectbox("Choose a product", product_names)
+        if st.button("Search"):
+            product = db.find_product_by_name(selected_name)
+            if product:
+                st.write(product)
+            else:
+                st.error("Product not found")
+    else:
+        st.info("No products available yet.")
+
 if __name__ == "__main__":
     db.init_db()
     main()
